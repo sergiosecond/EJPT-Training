@@ -1,4 +1,4 @@
-+ Utilizaremos Docker para levantar los laboratorios
+-  Utilizaremos Docker para levantar los laboratorios
 + Los contenedores vienen sin tools instaladas
 
 ## Estructura DockerFIle
@@ -67,3 +67,19 @@ Realiza lo mimso que COPY pero fuera del dockerfile
 - Sudo docker-compose up -d
 - Ver logs 
 1. sudo docker-compose logs
+
+### Crear  Subredes en docker
+
+- Creo Red
+```bash
+docker network create --driver=bridge --subnet=10.0.0.1/24 red1
+```
+
+- a una imagen que tengo le pongo nombre y la ejecuto
+```bash
+docker run --dit --name produccion ubuntu
+```
+- Conecto el contenedor a la red por nombre de red y nombre de contenedor
+```bash
+docker network connect red1 produccion
+```
