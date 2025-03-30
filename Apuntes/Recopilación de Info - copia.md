@@ -23,7 +23,7 @@ davidgrecas@gmail.com:Intelx,1023
 > Una buena wordlist es seclist/discovery/web-content/directory-list-2.3-medium.txt
 ### Gobuster  
 1.  -s 200 --> para códigos de estado afirmativos
-2. extensiones que quiero --> -x php,html,htm,txt ,php.bak lo que sea **.bak**
+2. extensiones qu equiero --> -x php,html,htm,txt 
 3. Añade un guión al final --> --add-slash
 4. gobuster dir -u https://www.gestoriacoslada.com -w /home/kuser/cosas/repositorios/SecLists/Discovery/DNS/subdomains-top1million-110000.txt  --add-slash -b 403,404
 5. gobuster dir -u https://www.gestoriacoslada.com -w /home/kuser/cosas/repositorios/SecLists/Discovery/DNS/subdomains-top1million-110000.txt  -x html -s 200 -b ' '
@@ -50,15 +50,12 @@ davidgrecas@gmail.com:Intelx,1023
 4. Fuzzear los id a y fijarnos en las palabras o characteres que sea iguales en el `response ` -->  
 - wfuzz -c --hc=404,400,403 -z range,1-2000 'https://valvonta.es/product_id=FUZZ
 
-1. Ocultar lo que encuentre con 6154 palabras y filtar la respuesta diferente --> 
+4. Ocultar lque encuentre con 6154 palabras y filtar la respuesta diferente --> 
 - wfuzz -c --hw=6154 --hc=404,400,403 -z range,1-2000 'https://valvonta.es/product_id=FUZZ
 ### ffuf (El repo tiene más opciones que el binario de kali)
 - Sólo coge los códigos 200 a 200 threads (10 por default)
  ./ffuf -c -t 200 --mc 200  -w /usr/share/wordlists/dirb/common.txt -u https://valvonta.es/FUZZ/
-- Fuzzea los métodos permitidos 
-```bash
-ffuf -u http://localhost:8888/workshop/api/shop/products -w /usr/share/SecLists/Fuzzing/http-request-methods.txt -X FUZZ  -mc 401,200
-```
+
 
 ## Una vez en la web - Reconocimiento de tecnologías
 
