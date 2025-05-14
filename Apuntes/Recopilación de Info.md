@@ -29,7 +29,6 @@ davidgrecas@gmail.com:Intelx,1023
 5. gobuster dir -u https://www.gestoriacoslada.com -w /home/kuser/cosas/repositorios/SecLists/Discovery/DNS/subdomains-top1million-110000.txt  -x html -s 200 -b ' '
 6. Subdominios --> gobuster vhost -u https://www.gestoriacoslada.com -w /home/kuser/cosas/repositorios/SecLists/Discovery/DNS/subdomains-top1million-110000.txt 
 
-###  dirb
 ###  wfuzz 
 - Escaneamos directorios, parámetros, solicitudes GET y POST
 1. No sacar esos códigos de estado  --> 

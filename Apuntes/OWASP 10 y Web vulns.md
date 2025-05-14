@@ -91,8 +91,6 @@ if __name__ == '__main__':
 	makeSQLI( )
 ```
 
-### SQLmap
-
 ## XSS
 
 > Inyección JS para secuestrar el correo

