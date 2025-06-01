@@ -134,6 +134,7 @@ search rejetto
 ```
 ### MYSQL
 
+> Si tienes este servicio corriendo y has conseguido explotar una vuln para leer archivos lee este por si hay leaks **/home/admin/.mysql_hist**
 - Módulos utilizados
 ```bash
 search type:auxiliary name:sql

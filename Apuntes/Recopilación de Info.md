@@ -9,7 +9,7 @@ Ver emails y social media --> clearbit extension chrome
 
 - https://www.verifyemailaddress.org/
 - https://pimeyes.com --> info reversa por imágenes
-davidgrecas@gmail.com:Intelx,1023
+d*grec*@gmail.com:Intelx,1023
 
 ## Enumerar Subdomains
 

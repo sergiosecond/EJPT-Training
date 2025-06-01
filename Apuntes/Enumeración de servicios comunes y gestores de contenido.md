@@ -2,6 +2,14 @@
 ---
 ## Enumeración Servicio SSH
 ---
+> Petar Priv Key **ssh**
+
+- Si encontramos clave privada 
+```bash
+sudo ssh2john id_rsa > hash.txt 
+sudo john --wordlist=/usr/share/wordlists/rockyou.txt --format=ssh  hash.txt
+```
+
 
 > Bruteforce a ssh 
 
@@ -98,6 +106,12 @@ mount -t cifs //127.0.0.1/myshare aquitemonto -o username=null,password=null,dom
 ****Cuidado porque se crea un enlace simbólico y lo que editemos en local se crea en la máquina real
 
 ## Enumeración de (CMS) – WordPress
+> Una vez dentro de la máquina, buscar los archivos con credenciales **POR FAVOR**
+
+- Enumerar plugins, después buscar exploit
+```bash
+sudo nmap -sV --script http-wordpress* --script-args http-wordpress-enum.root="/wordpress/",check-latest=true,search-limit=700  -p80 -v -Pn -n -T3 -oA wordpress remote.nyx
+```
 
 - Docker con wordpress vulnerable en --> https://github.com/vavkamil/dvwp
 

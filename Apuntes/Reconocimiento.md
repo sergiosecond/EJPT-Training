@@ -10,6 +10,7 @@
 
 ## Nmap 
 
+
 - Todos los puertos --> nmap -p- 192.168.1.1 
 - 1000 más comunes --> nmap 192.168.1.1
 - 500 más comunes --> nmap --top-ports 500 192.168.1.1
@@ -19,6 +20,10 @@
 - lanza escaneos cada 2 min --> nmap -p- --scan-delay 2m 192.168.1.1
 - aplica un barrido con ping al rango y sacar las IPs up --> nmap -sn 192.168.1.1/24 | grep -oP '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
 - Busca versión y scripts --> nmap -sVC 192.168.1.1
+- Buscamos vulns en puertos específicos
+```bash
+nmap -script vuln -p445 192.168.1.1
+```
 ### Evasión de firewall
 
 - Poner muchas IPS, puede que el firewall permita  a una de ellas para ver si el port está up --> nmap -D 192.168.1.15,192.168.1.72,192.168.1.52, etc... 192.168.1.1

