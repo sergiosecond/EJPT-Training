@@ -47,7 +47,7 @@ d*grec*@gmail.com:Intelx,1023
 - wfuzz -c --hc=404,400,403  -z html.php,list  -w /home/kuser/cosas/repositorios/SecLists/Discovery/DNS/subdomains-top1million-5000.txt https://valvonta.es/FUZZ.html 
 
 4. Fuzzear los id a y fijarnos en las palabras o characteres que sea iguales en el `response ` -->  
-- wfuzz -c --hc=404,400,403 -z range,1-2000 'https://valvonta.es/product_id=FUZZ
+- wfuzz -c --hc=404,400,403 -z range,1-2000 'https://valvonta.es/product_id=FUZZ'
 
 1. Ocultar lo que encuentre con 6154 palabras y filtar la respuesta diferente --> 
 - wfuzz -c --hw=6154 --hc=404,400,403 -z range,1-2000 'https://valvonta.es/product_id=FUZZ
